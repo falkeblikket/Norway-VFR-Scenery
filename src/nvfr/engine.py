@@ -119,10 +119,12 @@ class Engine:
             raise Conflict(f"Ownership marker changed: {path}")
         if inventory(path) != record["inventory"]:
             raise Conflict(f"Files changed outside the manager: {path}. Back up and restore them before changing this installation.")
-        if record["method"] == "linked" and record["active"]:
+        if record["method"] == "linked":
             activation = child(community, folder)
-            if not points_to(activation, path):
+            if record["active"] and not points_to(activation, path):
                 raise Conflict(f"Activation link was removed or changed externally: {activation}. Restore it before continuing.")
+            if not record["active"] and self._occupied(activation):
+                raise Conflict(f"A disabled package was activated externally: {activation}. Remove that external link in its owning tool first.")
         return path
 
     @staticmethod

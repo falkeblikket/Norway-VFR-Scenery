@@ -178,3 +178,15 @@ def test_external_changes_to_junction_are_preserved(engine, settings, make_zip, 
         engine.uninstall(record["id"], confirmed=True)
     assert points_to(link, other)
     assert Path(record["path"]).exists()
+
+
+def test_external_activation_of_disabled_package_is_preserved(engine, settings, make_zip):
+    settings = replace(settings, method="linked")
+    record = engine.install(selection(make_zip()), settings, confirmed=True)[0]
+    engine.set_active(record["id"], False)
+    link = Path(settings.community) / "test-airport"
+    create_link(link, Path(record["path"]))
+    with pytest.raises(Conflict, match="activated externally"):
+        engine.uninstall(record["id"], confirmed=True)
+    assert points_to(link, Path(record["path"]))
+    assert Path(record["path"]).exists()

@@ -6,6 +6,7 @@ import hashlib
 import json
 import stat
 import zipfile
+import zlib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -49,6 +50,8 @@ def _index(zf: zipfile.ZipFile, limits: Limits) -> dict[str, zipfile.ZipInfo]:
     result = {}
     paths: dict[str, tuple[str, bool]] = {}
     for item in members:
+        if item.orig_filename != item.filename:
+            raise UnsafeArchive("ZIP entry contains a truncated or NUL-containing name")
         parts = safe_parts(item.filename)
         if any(p.lower().startswith(".nvfr") for p in parts):
             raise UnsafeArchive("Archive contains a reserved manager filename")
@@ -153,7 +156,7 @@ def inspect_zip(path: Path, limits: Limits = Limits()) -> list[Package]:
             if len({name_key(p.folder) for p in packages}) != len(packages):
                 raise UnsafeArchive("Multiple packages have the same destination directory name")
             return packages
-    except (zipfile.BadZipFile, OSError, RuntimeError, NotImplementedError) as exc:
+    except (zipfile.BadZipFile, OSError, RuntimeError, NotImplementedError, zlib.error) as exc:
         raise UnsafeArchive(f"Cannot read ZIP {path.name}: {exc}") from exc
 
 
@@ -185,5 +188,5 @@ def extract_package(package: Package, destination: Path, limits: Limits = Limits
                             out.write(chunk)
                     if count != info.file_size:
                         raise UnsafeArchive("Truncated ZIP member")
-    except (zipfile.BadZipFile, KeyError, OSError, RuntimeError) as exc:
+    except (zipfile.BadZipFile, KeyError, OSError, RuntimeError, zlib.error) as exc:
         raise UnsafeArchive(f"Extraction failed: {exc}") from exc

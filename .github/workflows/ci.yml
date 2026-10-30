@@ -2,7 +2,7 @@ name: Test and build Windows application
 
 on:
   push:
-    branches: [main, 'feature/**']
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -18,8 +18,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
         with:
           python-version: '3.12'
           cache: pip
@@ -31,7 +31,7 @@ jobs:
       - name: Tests on Linux (including GUI)
         if: runner.os == 'Linux'
         run: xvfb-run -a python -m pytest -q --junitxml=test-results/results.xml
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: test-results-${{ runner.os }}
@@ -41,8 +41,8 @@ jobs:
     needs: test
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
         with:
           python-version: '3.12'
           cache: pip
@@ -61,7 +61,7 @@ jobs:
       - name: Archive portable application
         shell: pwsh
         run: Compress-Archive -Path dist/NorwayVFR -DestinationPath dist/NorwayVFR-0.1.0-Windows-x64.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: NorwayVFR-0.1.0-Windows-x64
           path: dist/NorwayVFR-0.1.0-Windows-x64.zip

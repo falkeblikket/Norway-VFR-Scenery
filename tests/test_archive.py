@@ -94,3 +94,11 @@ def test_crc_failure_during_extraction(make_zip, tmp_path):
     package = replace(package, sha256=digest(path))
     with pytest.raises((UnsafeArchive, zipfile.BadZipFile)):
         extract_package(package, tmp_path / "stage")
+
+
+def test_nul_truncated_central_directory_name_is_rejected(make_zip):
+    path = make_zip(extra={"rogue.txt": "bad"})
+    content = path.read_bytes().replace(b"rogue.txt", b"rogue\x00txt")
+    path.write_bytes(content)
+    with pytest.raises(UnsafeArchive, match="NUL"):
+        inspect_zip(path)
