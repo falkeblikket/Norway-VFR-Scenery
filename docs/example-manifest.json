@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "catalogue_id": "documentation-example",
+  "title": "One real listing — format example only",
+  "updated_at": "2026-10-30",
+  "packages": [
+    {
+      "id": "flightsim-to-90766",
+      "name": "Norway Church Fix",
+      "developer": "ErikHanoy",
+      "description": "Landmarks scenery listed by ErikHanoy. Consult the original page for the features and installation instructions.",
+      "category": "landmarks",
+      "flightsim_to": {
+        "id": 90766,
+        "url": "https://flightsim.to/addon/90766/norway-church-fix-please-read-instructions"
+      },
+      "version": "3.4",
+      "last_verified": "2026-10-30",
+      "compatibility": {
+        "msfs2020": "unknown",
+        "msfs2024": "reported"
+      },
+      "geography": {
+        "country": "Norway",
+        "region": "unknown",
+        "coordinates": "unknown"
+      },
+      "dependencies": "unknown",
+      "conflicts": "unknown",
+      "license": {
+        "name": "unknown",
+        "url": "unknown",
+        "redistribution": "unknown"
+      },
+      "attribution": "Scenery by ErikHanoy. Original listing and download: Flightsim.to. Scenery is not included with this manager.",
+      "installation": {
+        "folder_names": "unknown",
+        "notes": "Read the author instructions before import; optional packages, external libraries and non-Community files may need separate handling."
+      },
+      "sha256": "unknown",
+      "verification": {
+        "status": "partial",
+        "sources": [
+          {
+            "url": "https://flightsim.to/addon/90766/norway-church-fix-please-read-instructions",
+            "checked_at": "2026-10-30",
+            "fields": [
+              "name",
+              "developer",
+              "category",
+              "flightsim_to",
+              "version",
+              "compatibility",
+              "geography.country",
+              "geography.region"
+            ],
+            "note": "Public Flightsim.to listing: freeware (isPremium=false); simulator label MSFS2024; source category Scenery Enhancements / Landmarks. Compatibility is reported by the listing, not independently tested. Region is a title-derived area label when present. Licence, dependencies, conflicts, folder names and archive checksum were not verified."
+          }
+        ]
+      }
+    }
+  ]
+}

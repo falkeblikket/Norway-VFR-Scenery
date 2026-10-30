@@ -1,0 +1,362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/falkeblikket/Norway-VFR-Scenery/raw/main/src/nvfr/data/catalogue.schema.json",
+  "title": "Norway VFR catalogue 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "catalogue_id",
+    "title",
+    "updated_at",
+    "packages"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "catalogue_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,119}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "developer",
+          "description",
+          "category",
+          "flightsim_to",
+          "version",
+          "last_verified",
+          "compatibility",
+          "geography",
+          "dependencies",
+          "conflicts",
+          "license",
+          "attribution",
+          "installation",
+          "sha256",
+          "verification"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{2,119}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "developer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "enum": [
+              "airport",
+              "landmarks",
+              "landscape",
+              "heliport",
+              "library",
+              "other",
+              "unknown"
+            ]
+          },
+          "flightsim_to": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "url"
+            ],
+            "properties": {
+              "id": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                ]
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://flightsim\\.to/(?:file|addon)/[0-9]+/[^?#]+$"
+              }
+            }
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_verified": {
+            "oneOf": [
+              {
+                "const": "unknown"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              }
+            ]
+          },
+          "compatibility": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "msfs2020",
+              "msfs2024"
+            ],
+            "properties": {
+              "msfs2020": {
+                "enum": [
+                  "confirmed",
+                  "reported",
+                  "incompatible",
+                  "unknown"
+                ]
+              },
+              "msfs2024": {
+                "enum": [
+                  "confirmed",
+                  "reported",
+                  "incompatible",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "geography": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "country",
+              "region",
+              "coordinates"
+            ],
+            "properties": {
+              "country": {
+                "type": "string",
+                "minLength": 1
+              },
+              "region": {
+                "type": "string",
+                "minLength": 1
+              },
+              "coordinates": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "latitude",
+                      "longitude"
+                    ],
+                    "properties": {
+                      "latitude": {
+                        "type": "number",
+                        "minimum": -90,
+                        "maximum": 90
+                      },
+                      "longitude": {
+                        "type": "number",
+                        "minimum": -180,
+                        "maximum": 180
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "dependencies": {
+            "oneOf": [
+              {
+                "const": "unknown"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9._-]{2,119}$"
+                },
+                "uniqueItems": true
+              }
+            ]
+          },
+          "conflicts": {
+            "oneOf": [
+              {
+                "const": "unknown"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9._-]{2,119}$"
+                },
+                "uniqueItems": true
+              }
+            ]
+          },
+          "license": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "url",
+              "redistribution"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "url": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "string",
+                    "format": "uri",
+                    "pattern": "^https://"
+                  }
+                ]
+              },
+              "redistribution": {
+                "enum": [
+                  "permitted",
+                  "prohibited",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "attribution": {
+            "type": "string",
+            "minLength": 1
+          },
+          "installation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "folder_names",
+              "notes"
+            ],
+            "properties": {
+              "folder_names": {
+                "oneOf": [
+                  {
+                    "const": "unknown"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true
+                  }
+                ]
+              },
+              "notes": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "sha256": {
+            "oneOf": [
+              {
+                "const": "unknown"
+              },
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            ]
+          },
+          "verification": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "sources"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "verified",
+                  "partial",
+                  "unverified"
+                ]
+              },
+              "sources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "url",
+                    "checked_at",
+                    "fields",
+                    "note"
+                  ],
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "pattern": "^https://"
+                    },
+                    "checked_at": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "fields": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "uniqueItems": true
+                    },
+                    "note": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "uniqueItems": true
+              }
+            }
+          }
+        }
+      },
+      "uniqueItems": true
+    }
+  }
+}
