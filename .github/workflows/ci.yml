@@ -1,0 +1,68 @@
+name: Test and build Windows application
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m ruff check src tests scripts
+      - name: Tests on Windows (including native junctions and GUI)
+        if: runner.os == 'Windows'
+        run: python -m pytest -q --junitxml=test-results/results.xml
+      - name: Tests on Linux (including GUI)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a python -m pytest -q --junitxml=test-results/results.xml
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: test-results-${{ runner.os }}
+          path: test-results/
+
+  windows-package:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -e ".[dev]"
+      - name: Build portable Windows application
+        run: python scripts/build_windows.py
+      - name: Start the packaged application and verify its catalogue
+        shell: pwsh
+        run: |
+          $smokeDir = Join-Path $env:RUNNER_TEMP "nvfr-packaged-smoke"
+          $app = Start-Process -FilePath "dist/NorwayVFR/NorwayVFR.exe" -ArgumentList @("--smoke-test", "--data-dir", $smokeDir) -PassThru
+          if (-not $app.WaitForExit(60000)) { $app.Kill(); throw "Packaged GUI did not exit" }
+          if ($app.ExitCode -ne 0) { Get-Content "$smokeDir/manager.log"; throw "Packaged GUI failed" }
+          $report = Get-Content "$smokeDir/smoke-test.json" | ConvertFrom-Json
+          if (-not $report.ok -or $report.catalogue_packages -lt 1) { throw "Catalogue/startup check failed" }
+      - name: Archive portable application
+        shell: pwsh
+        run: Compress-Archive -Path dist/NorwayVFR -DestinationPath dist/NorwayVFR-0.1.0-Windows-x64.zip
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: NorwayVFR-0.1.0-Windows-x64
+          path: dist/NorwayVFR-0.1.0-Windows-x64.zip
+          retention-days: 90
